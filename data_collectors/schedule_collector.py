@@ -29,7 +29,7 @@ def get_schedules():
     data = json.load(routes)
     lines = list(data.keys())  # LIST OF ALL LINES
 
-    # Getting line info:
+    # Get line info:
     for i in range(len(lines)):
         line_schedule = dict()
         line_info = []
@@ -70,6 +70,5 @@ def get_schedules():
         with open(os.path.join(schedule_dir, new_file), 'w') as s:
             json.dump(line_schedule, s, indent=2)
 
-
-    # Close routes:
+    # Close file
     routes.close()
