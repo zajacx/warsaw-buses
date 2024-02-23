@@ -7,6 +7,12 @@ from datetime import datetime
 from data_processing_scripts.dist_calculator import calculate_distance
 
 
+# Dataframe prepared with geojson for districts data:
+dist_df = gpd.read_file("static_data/districts.geojson")
+# Polygon vertices:
+dist_pg = [prep(v) for v in dist_df[1:]["geometry"]]
+
+
 def filter_json(raw_json):
     filtered_json = dict()
     for info in raw_json["result"]:
@@ -20,12 +26,16 @@ def filter_json(raw_json):
     return filtered_json
 
 
-def prepare_speed_stats():
-    # Dataframe prepared with geojson for districts data:
-    dist_df = gpd.read_file("static_data/districts.geojson")
-    # Polygon vertices:
-    dist_pg = [prep(v) for v in dist_df[1:]["geometry"]]
+def calculate_district(point):
+    # Check if the point is in the polygon
+    for index, pg in enumerate(dist_pg):
+        if pg.contains(point):
+            return dist_df.loc[index + 1, "name"]
 
+    return None
+
+
+def prepare_speed_stats():
     cwd = os.getcwd()
     # New directory for filtered data:
     os.makedirs("filtered_data", exist_ok=True)
@@ -49,6 +59,7 @@ def prepare_speed_stats():
 
     # Get data from all files:
     for i in range(1, files_count):
+        print(f"Processing file {i}")
         try:
             curr_file = open(os.path.join(data_dir, f"{i}.json"), "r")
         except FileNotFoundError:
@@ -65,22 +76,12 @@ def prepare_speed_stats():
             if end is None:
                 continue
 
-            dist_1 = 0
-            dist_2 = 0
+            # Calculate the districts
+            if "District" not in begin:
+                begin["District"] = calculate_district(Point(begin["Position"]))
+            end["District"] = calculate_district(Point(end["Position"]))
 
-            # Get info about previous and current district:
-            for index, pg in enumerate(dist_pg):
-                if pg.contains(Point(end["Position"])):
-                    dist_2 = dist_df.loc[index + 1, "name"]
-                else:
-                    dist_2 = None
-
-                if pg.contains(Point(begin["Position"])):
-                    dist_1 = dist_df.loc[index + 1, "name"]
-                else:
-                    dist_1 = None
-
-            if dist_1 is None or dist_2 is None:
+            if begin["District"] is None or end["District"] is None:
                 continue
 
             # Calculate time difference (skip in case of an error):
@@ -101,8 +102,7 @@ def prepare_speed_stats():
             speed = speed * 3.6
 
             # Write statistics to csv:
-            segments_data.write(f"{begin['Position'][0]},{begin['Position'][1]},{dist_1},{end['Position'][0]},{end['Position'][1]},{dist_2},{speed}\n")
-            print(f"Prepared {i}. data")
+            segments_data.write(f"{begin['Position'][0]},{begin['Position'][1]},{begin['District']},{end['Position'][0]},{end['Position'][1]},{end['District']},{speed}\n")
 
             # Save bus' position:
             bus_positions.append(end)
