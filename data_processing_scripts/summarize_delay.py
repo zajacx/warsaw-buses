@@ -1,7 +1,7 @@
 import json
 import os
-
 import pandas as pd
+import matplotlib.pyplot as plt
 
 
 def calculate_delay_percentage(df):
@@ -21,17 +21,37 @@ def plot_delay():
     # Create dataframe:
     df = pd.DataFrame(json_data)
 
-    # Convert to minutes:
+    # Convert time to minutes:
     df['Delay_minutes'] = df['Time'] / 60
-
-    # Group by district:
     grouped_data = df.groupby('District')
-    for district, group in grouped_data:
-        print(f"Nazwa dzielnicy: {district}")
-        print("Spóźnienie:\tProcent:")
-        for i in range(1, 6):  # Zakładam 5 kategorii spóźnień, dostosuj do swoich potrzeb
-            subset = group[(group['Delay_minutes'] > (i - 1) * 5) & (group['Delay_minutes'] <= i * 5)]
+
+    # Prepare data for plots:
+    categories = []
+    percentages = []
+
+    for i in range(1, 6):
+        category = f"{i*5-4}-{i*5} min"
+        categories.append(category)
+
+        percentage_values = []
+        for district, group in grouped_data:
+            subset = group[(group['Delay_minutes'] > (i-1)*5) & (group['Delay_minutes'] <= i*5)]
             percentage = len(subset) / len(group) * 100 if len(group) > 0 else 0
-            print(f"{i * 5 - 4}-{i * 5} min:\t\t{percentage:.2f}%")
-        print("\n")
+            percentage_values.append(percentage)
+
+        percentages.append(percentage_values)
+
+    fig, ax = plt.subplots()
+
+    for i, category in enumerate(categories):
+        ax.bar([x + i*0.2 for x in range(len(grouped_data))], percentages[i], width=0.2, label=category)
+
+    ax.set_xlabel('Dzielnica')
+    ax.set_ylabel('Procent')
+    ax.set_title('Procent spóźnionych autobusów w przedziałach czasowych')
+    ax.set_xticks([x + 0.4 for x in range(len(grouped_data))])
+    ax.set_xticklabels([district for district, _ in grouped_data], rotation='vertical')
+
+    ax.legend()
+    plt.show()
 

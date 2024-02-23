@@ -1,6 +1,6 @@
 import os.path
-
 import pandas as pd
+import matplotlib.pyplot as plt
 
 
 def calculate_speed_percentage(df):
@@ -21,5 +21,13 @@ def plot_speed():
 
     # Create dataframe with results:
     result_df = pd.DataFrame(grouped_data).rename(columns={'dist1': 'Dzielnica', 'percentage': '% wykroczeń'})
-    print(result_df)
+
+    # Plotting the results:
+    result_df.plot(kind='bar', x='Dzielnica', y='% wykroczeń', legend=False)
+    plt.xlabel('Dzielnica')
+    plt.ylabel('% wykroczeń')
+    plt.title('Procent autobusów przekraczających prędkość w poszczególnych dzielnicach')
+    plt.show()
+
+    # print(result_df)
     print("\n")
