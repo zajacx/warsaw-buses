@@ -35,3 +35,23 @@ def get_online_data():
         act_loc = os.path.join(data_dir, f"{i}.json")
         with open(act_loc, 'w') as file:
             json.dump(response, file, indent=2)
+
+
+def remove_wrong_files():
+    cwd = os.getcwd()
+    dir = os.path.join(cwd, "online_data", "busy_hours")
+    for i in range(600):
+        file_dir = os.path.join(dir, f"{i}.json")
+        file = open(file_dir, "r")
+        data = json.load(file)
+        file.close()
+        if data["result"] == "B\u0142\u0119dna metoda lub parametry wywo\u0142ania":
+            try:
+                os.remove(file_dir)
+                # print(f"File {file_dir} removed successfully.")
+            except FileNotFoundError:
+                print(f"File {file_dir} not found.")
+            except Exception as e:
+                print(f"An error occurred: {e}")
+        else:
+            continue

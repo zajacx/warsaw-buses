@@ -5,6 +5,7 @@ from data_collectors.bus_stops_collector import get_bus_stops
 from data_collectors.routes_collector import get_routes
 from data_collectors.schedule_collector import get_schedules
 from data_collectors.online_data_collector import get_online_data
+from data_collectors.online_data_collector import remove_wrong_files
 
 
 def get_all_data():
@@ -14,4 +15,5 @@ def get_all_data():
     # get_routes()
     # get_schedules()
     # os.makedirs("online_data", exist_ok=True)
-    get_online_data()
+    # get_online_data()
+    remove_wrong_files()
