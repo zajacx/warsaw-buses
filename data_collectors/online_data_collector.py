@@ -39,9 +39,9 @@ def get_online_data():
 
 def remove_wrong_files():
     cwd = os.getcwd()
-    dir = os.path.join(cwd, "online_data", "busy_hours")
+    directory = os.path.join(cwd, "online_data", "busy_hours")
     for i in range(600):
-        file_dir = os.path.join(dir, f"{i}.json")
+        file_dir = os.path.join(directory, f"{i}.json")
         file = open(file_dir, "r")
         data = json.load(file)
         file.close()

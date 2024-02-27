@@ -13,8 +13,8 @@ def calculate_delay_percentage(df):
 
 def plot_delay():
     cwd = os.getcwd()
-    dir = os.path.join(cwd, "filtered_data", "filt_bus_positions_busy.json")
-    file = open(dir, "r")
+    directory = os.path.join(cwd, "filtered_data", "filt_bus_positions_busy.json")
+    file = open(directory, "r")
     json_data = json.load(file)
     file.close()
 

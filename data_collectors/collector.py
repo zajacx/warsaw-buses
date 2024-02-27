@@ -1,6 +1,5 @@
 import os
 
-from data_collectors.dict_collector import get_dict
 from data_collectors.bus_stops_collector import get_bus_stops
 from data_collectors.routes_collector import get_routes
 from data_collectors.schedule_collector import get_schedules
